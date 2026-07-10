@@ -2,6 +2,8 @@ import { utilService } from './services/util.service.js'
 import { locService } from './services/loc.service.js'
 import { mapService } from './services/map.service.js'
 
+var gUserPos = 0
+
 window.onload = onInit
 
 // To make things easier in this project structure 
@@ -42,6 +44,9 @@ function renderLocs(locs) {
             <h4>  
                 <span>${loc.name}</span>
                 <span title="${loc.rate} stars">${'★'.repeat(loc.rate)}</span>
+            </h4>
+            <h4>
+            <span>distance: ${utilService.getDistance(gUserPos, loc.geo)} km</span>
             </h4>
             <p class="muted">
                 Created: ${utilService.elapsedTime(loc.createdAt)}
@@ -106,7 +111,7 @@ function onAddLoc(geo) {
         geo
     }
 
-    if(loc.rate > 5) {
+    if (loc.rate > 5) {
         alert('Rate cannot be more than 5')
         return onAddLoc(geo)
     }
@@ -136,6 +141,8 @@ function onPanToUserPos() {
     mapService.getUserPosition()
         .then(latLng => {
             mapService.panTo({ ...latLng, zoom: 15 })
+            gUserPos = latLng
+            console.log(gUserPos)
             unDisplayLoc()
             loadAndRenderLocs()
             flashMsg(`You are at Latitude: ${latLng.lat} Longitude: ${latLng.lng}`)
