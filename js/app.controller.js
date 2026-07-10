@@ -105,6 +105,9 @@ function onAddLoc(geo) {
         rate: +prompt(`Rate (1-5)`, '3'),
         geo
     }
+
+    if(loc.rate > 5) return alert('Rate cannot be more than 5')
+
     locService.save(loc)
         .then((savedLoc) => {
             flashMsg(`Added Location (id: ${savedLoc.id})`)
