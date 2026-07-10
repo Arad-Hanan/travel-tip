@@ -106,7 +106,10 @@ function onAddLoc(geo) {
         geo
     }
 
-    if(loc.rate > 5) return alert('Rate cannot be more than 5')
+    if(loc.rate > 5) {
+        alert('Rate cannot be more than 5')
+        return onAddLoc(geo)
+    }
 
     locService.save(loc)
         .then((savedLoc) => {
