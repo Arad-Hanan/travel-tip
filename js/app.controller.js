@@ -39,15 +39,17 @@ function renderLocs(locs) {
 
     var strHTML = locs.map(loc => {
         const className = (loc.id === selectedLocId) ? 'active' : ''
+        const distance = (gUserPos !== 0) ? `<h4>
+            <span>distance: ${utilService.getDistance(gUserPos, loc.geo)} km</span>
+            </h4>` : ''
+
         return `
         <li class="loc ${className}" data-id="${loc.id}">
             <h4>  
                 <span>${loc.name}</span>
                 <span title="${loc.rate} stars">${'★'.repeat(loc.rate)}</span>
             </h4>
-            <h4>
-            <span>distance: ${utilService.getDistance(gUserPos, loc.geo)} km</span>
-            </h4>
+            ${distance}
             <p class="muted">
                 Created: ${utilService.elapsedTime(loc.createdAt)}
                 ${(loc.createdAt !== loc.updatedAt) ?
@@ -138,11 +140,12 @@ function loadAndRenderLocs() {
 }
 
 function onPanToUserPos() {
+    const elDistance = document.querySelector('.distance')
+
     mapService.getUserPosition()
         .then(latLng => {
             mapService.panTo({ ...latLng, zoom: 15 })
             gUserPos = latLng
-            console.log(gUserPos)
             unDisplayLoc()
             loadAndRenderLocs()
             flashMsg(`You are at Latitude: ${latLng.lat} Longitude: ${latLng.lng}`)
