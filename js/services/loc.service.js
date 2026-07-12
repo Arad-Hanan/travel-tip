@@ -103,18 +103,19 @@ function getLocCountByRateMap() {
 }
 
 function getLocCountByDateMap() {
-    const day = new Date()
+    const startOfToday = new Date()
+    startOfToday.setHours(0, 0, 0, 0)
+    const startOfTodayMs = startOfToday.getTime()
+
     return storageService.query(DB_KEY)
         .then(locs => {
             const locCountByDateMap = locs.reduce((map, loc) => {
-                const date = new Date(loc.updatedAt)
-                
-                if (date < day.getDay()) map.past++
-                else if (date === day.getDay()) map.today++
-                else map.never++
+                if (!loc.updatedAt || loc.updatedAt === loc.createdAt) map.never++
+                else if (loc.updatedAt >= startOfTodayMs) map.today++
+                else map.past++
                 return map
             }, {today: 0, past: 0, never: 0 })
-            console.log(locCountByDateMap)
+            locCountByDateMap.total = locs.length
             return locCountByDateMap
         })
 }
@@ -152,7 +153,6 @@ function _createDemoLocs() {
                     lng: 34.9457792,
                     zoom: 15
                 },
-                updatedAt: Date.now()
             },
             {
                 name: "Dahab, Egypt",
@@ -163,7 +163,6 @@ function _createDemoLocs() {
                     lng: 34.5165187,
                     zoom: 11
                 },
-                updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 5   // past (5 days ago)
             }
         ]
 
