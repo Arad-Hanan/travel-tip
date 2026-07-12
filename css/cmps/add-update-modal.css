@@ -1,0 +1,64 @@
+.add-update-modal {
+    border: none;
+    border-radius: 10px;
+    padding: 1.5em;
+    min-width: 320px;
+    max-width: 90vw;
+    background-color: var(--bg3);
+    color: var(--color1);
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 8px 24px;
+}
+
+/* only lay out as flex when the dialog is actually open,
+   otherwise `display: flex` overrides the browser's hide-when-closed */
+.add-update-modal[open] {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8em;
+}
+
+.add-update-modal::backdrop {
+    background-color: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(2px);
+}
+
+.add-update-modal label {
+    font-weight: bold;
+    margin-bottom: -0.4em;
+}
+
+.add-update-modal input {
+    padding: 0.5em 0.6em;
+    border: 1px solid var(--bg1);
+    border-radius: 6px;
+    background-color: var(--color1);
+    color: #222;
+    font-size: 1em;
+}
+
+.add-update-modal input:focus {
+    outline: 2px solid var(--color3);
+    border-color: var(--color3);
+}
+
+/* the button lives in its own <form method="dialog"> */
+.add-update-modal form {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1em;
+}
+
+.add-update-modal form button {
+    padding: 0.5em 1.4em;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: var(--color3);
+    color: var(--bg3);
+    transition: 0.2s;
+}
+
+.add-update-modal form button:hover {
+    background-color: var(--color4);
+}

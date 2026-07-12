@@ -128,11 +128,12 @@ function onShowModal(loc) {
 
     if (loc.name === '') elModalNameInput.value = loc.geo.address
     else elModalNameInput.value = loc.name
-    if (loc.rate !== 0) elModalRateInput = loc.rate
+    if (loc.rate !== 0) elModalRateInput.value = loc.rate
     elAddUpdateModal.showModal()
 }
 
-function onSubmitModal() {
+function onSubmitModal(ev) {
+    ev.preventDefault()
     const elAddUpdateModal = document.querySelector('.add-update-modal')
     const elModalNameInput = elAddUpdateModal.querySelector('.loc-name')
     const elModalRateInput = elAddUpdateModal.querySelector('.loc-rating')
@@ -167,6 +168,7 @@ function onSubmitModal() {
     elModalNameInput.value = ''
     elModalRateInput.value = 0
     gTempLoc = {}
+    elAddUpdateModal.close()
 }
 
 function loadAndRenderLocs() {
@@ -304,6 +306,9 @@ function onSetFilterBy({ txt, minRate }) {
 function renderLocStats() {
     locService.getLocCountByRateMap().then(stats => {
         handleStats(stats, 'loc-stats-rate')
+    })
+    locService.getLocCountByDateMap().then(stats => {
+        handleStats(stats, 'loc-stats-date')
     })
 }
 

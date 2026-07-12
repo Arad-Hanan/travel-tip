@@ -18,7 +18,7 @@ import { storageService } from './async-storage.service.js'
 const PAGE_SIZE = 5
 const DB_KEY = 'locs'
 var gSortBy = { rate: -1 }
-var gFilterBy = { txt: '', minRate: 0,}
+var gFilterBy = { txt: '', minRate: 0, }
 var gPageIdx
 
 _createLocs()
@@ -30,7 +30,8 @@ export const locService = {
     save,
     setFilterBy,
     setSortBy,
-    getLocCountByRateMap
+    getLocCountByRateMap,
+    getLocCountByDateMap
 }
 
 function query() {
@@ -101,6 +102,23 @@ function getLocCountByRateMap() {
         })
 }
 
+function getLocCountByDateMap() {
+    const day = new Date()
+    return storageService.query(DB_KEY)
+        .then(locs => {
+            const locCountByDateMap = locs.reduce((map, loc) => {
+                const date = new Date(loc.updatedAt)
+                
+                if (date < day.getDay()) map.past++
+                else if (date === day.getDay()) map.today++
+                else map.never++
+                return map
+            }, {today: 0, past: 0, never: 0 })
+            console.log(locCountByDateMap)
+            return locCountByDateMap
+        })
+}
+
 function setSortBy(sortBy = {}) {
     gSortBy = sortBy
 }
@@ -123,7 +141,7 @@ function _createDemoLocs() {
                     lat: 32.0004465,
                     lng: 34.8706095,
                     zoom: 12
-                },
+                },                           
             },
             {
                 name: "Dekel Beach",
@@ -134,6 +152,7 @@ function _createDemoLocs() {
                     lng: 34.9457792,
                     zoom: 15
                 },
+                updatedAt: Date.now()
             },
             {
                 name: "Dahab, Egypt",
@@ -143,7 +162,8 @@ function _createDemoLocs() {
                     lat: 28.5096676,
                     lng: 34.5165187,
                     zoom: 11
-                }
+                },
+                updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 5   // past (5 days ago)
             }
         ]
 
