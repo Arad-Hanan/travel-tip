@@ -67,6 +67,16 @@
             </section>
         </div>
     </main>
+
+    <dialog class="add-update-modal" onsubmit="app.onSubmitModal()">
+        <input type="text" class="loc-name">Name: </input>
+        <input type="number" class="loc-rating">Rating</input>
+
+        <form method="dialog">
+            <button>save</button>
+        </form>
+    </dialog>
+
     <pre class="debug" hidden></pre>
     <div class="user-msg"></div>
     <script type="module" src="js/app.controller.js"></script>

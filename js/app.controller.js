@@ -3,6 +3,7 @@ import { locService } from './services/loc.service.js'
 import { mapService } from './services/map.service.js'
 
 var gUserPos = 0
+var gTempLoc = {}
 
 window.onload = onInit
 
@@ -18,6 +19,8 @@ window.app = {
     onShareLoc,
     onSetSortBy,
     onSetFilterBy,
+    onShowModal,
+    onSubmitModal
 }
 
 function onInit() {
@@ -104,18 +107,50 @@ function onSearchAddress(ev) {
 }
 
 function onAddLoc(geo) {
-    const locName = prompt('Loc name', geo.address || 'Just a place')
-    if (!locName) return
-
-    const loc = {
-        name: locName,
-        rate: +prompt(`Rate (1-5)`, '3'),
-        geo
+    var loc = {
+        id: '',
+        name: '',
+        rate: 0,
+        geo: geo,
+        createdAt: 0,
+        updatedAt: 0
     }
+
+    onShowModal(loc)
+}
+
+function onShowModal(loc) {
+    const elAddUpdateModal = document.querySelector('.add-update-modal')
+    const elModalNameInput = elAddUpdateModal.querySelector('.loc-name')
+    const elModalRateInput = elAddUpdateModal.querySelector('.loc-rating')
+
+    gTempLoc = loc
+
+    if (loc.name === '') elModalNameInput.value = loc.geo.address
+    else elModalNameInput.value = loc.name
+    if (loc.rate !== 0) elModalRateInput = loc.rate
+    elAddUpdateModal.showModal()
+}
+
+function onSubmitModal() {
+    const elAddUpdateModal = document.querySelector('.add-update-modal')
+    const elModalNameInput = elAddUpdateModal.querySelector('.loc-name')
+    const elModalRateInput = elAddUpdateModal.querySelector('.loc-rating')
+
+    var loc = gTempLoc
+
+    loc.name = elModalNameInput.value
+    loc.rate = +elModalRateInput.value
 
     if (loc.rate > 5) {
         alert('Rate cannot be more than 5')
-        return onAddLoc(geo)
+        loc.rate = 0
+        elModalRateInput.value = 0
+        return
+    }
+    if (!loc.name) {
+        alert('Location must have a name')
+        return
     }
 
     locService.save(loc)
@@ -128,6 +163,10 @@ function onAddLoc(geo) {
             console.error('OOPs:', err)
             flashMsg('Cannot add location')
         })
+
+    elModalNameInput.value = ''
+    elModalRateInput.value = 0
+    gTempLoc = {}
 }
 
 function loadAndRenderLocs() {
@@ -158,22 +197,7 @@ function onPanToUserPos() {
 
 function onUpdateLoc(locId) {
     locService.getById(locId)
-        .then(loc => {
-            const rate = +prompt('New rate?', loc.rate)
-            if (rate && rate !== loc.rate) {
-                loc.rate = rate
-                locService.save(loc)
-                    .then(savedLoc => {
-                        flashMsg(`Rate was set to: ${savedLoc.rate}`)
-                        loadAndRenderLocs()
-                    })
-                    .catch(err => {
-                        console.error('OOPs:', err)
-                        flashMsg('Cannot update location')
-                    })
-
-            }
-        })
+        .then(loc => onShowModal(loc))
 }
 
 function onSelectLoc(locId) {
@@ -186,7 +210,6 @@ function onSelectLoc(locId) {
 }
 
 function displayLoc(loc) {
-    console.log(loc)
     document.querySelector('.loc.active')?.classList?.remove('active')
     document.querySelector(`.loc[data-id="${loc.id}"]`).classList.add('active')
 
